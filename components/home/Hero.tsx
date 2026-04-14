@@ -58,7 +58,7 @@ export function Hero() {
           />
           <button
             type="submit"
-            className="flex items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 transition-colors flex-shrink-0 min-h-0 h-auto"
+            className="flex items-center justify-center rounded-xl bg-primary px-4 h-10 text-sm font-semibold text-white hover:bg-teal-700 transition-colors flex-shrink-0"
           >
             Search
           </button>
