@@ -2,13 +2,21 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowLeft, MapPin, Phone, Clock, Star, Home as HomeIcon,
-  FlaskConical, ChevronRight, ShieldCheck
+  ArrowLeft,
+  MapPin,
+  Phone,
+  Clock,
+  Star,
+  Home as HomeIcon,
+  FlaskConical,
+  ChevronRight,
+  TrendingDown,
+  CheckCircle2,
 } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
 import { AccreditationBadge } from "@/components/ui/AccreditationBadge";
 import { AddToCartButton } from "@/components/discovery/AddToCartButton";
-import { getLabById, labs } from "@/data/labs";
+import { getLabById, labs, thyrocarePrices } from "@/data/labs";
 import { tests, labTests } from "@/data/tests";
 import { formatCurrency } from "@/lib/utils";
 
@@ -25,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const lab = getLabById(id);
   if (!lab) return {};
   return {
-    title: lab.name,
+    title: `${lab.name} — Neighbourhood Diagnostics`,
     description: `${lab.accreditation.join(" & ")} accredited lab in ${lab.area}, Hyderabad. Book diagnostic tests online.`,
   };
 }
@@ -69,47 +77,68 @@ export default async function LabDetailPage({ params }: Props) {
     "full-body": "Full Body",
   };
 
+  // Thyrocare comparison — tests where we have a benchmark AND this lab offers it
+  const comparisonTests = offeredTests
+    .filter(({ test, lt }) => {
+      const benchmark = thyrocarePrices[test.id];
+      return benchmark !== undefined && benchmark > lt.price;
+    })
+    .slice(0, 5);
+
+  const initials = lab.name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <PageShell noPadBottom>
+      {/* Back */}
       <Link
         href="/labs"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-500 hover:text-primary transition-colors mb-4 min-h-0 h-auto"
       >
-        <ArrowLeft size={16} /> All Labs
+        <ArrowLeft size={16} />
+        All Labs
       </Link>
 
-      {/* Lab header */}
+      {/* Lab header card */}
       <div className="rounded-2xl border border-border bg-white p-5 mb-4">
         <div className="flex items-start gap-4 mb-4">
-          {/* Big initials */}
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 font-heading font-extrabold text-teal-700 text-xl flex-shrink-0">
-            {lab.name.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-50 font-heading font-extrabold text-teal-700 text-xl flex-shrink-0 border border-teal-100">
+            {initials}
           </div>
           <div className="flex-1 min-w-0">
             <h1 className="font-heading text-xl font-extrabold text-stone-900 leading-tight mb-1">
               {lab.name}
             </h1>
-            <div className="flex items-center gap-1.5 text-sm text-stone-500">
+            <div className="flex items-center gap-1.5 text-sm text-stone-500 mb-2">
               <Star size={13} className="fill-amber-400 text-amber-400" />
               <span className="font-bold text-stone-800">{lab.rating}</span>
-              <span className="text-stone-400">({lab.reviewCount} reviews)</span>
+              <span className="text-stone-400">· {lab.reviewCount} reviews</span>
             </div>
-            <AccreditationBadge accreditations={lab.accreditation} className="mt-2" />
+            <AccreditationBadge accreditations={lab.accreditation} />
           </div>
         </div>
 
         {/* Info rows */}
-        <div className="flex flex-col gap-2.5 text-sm">
+        <div className="flex flex-col gap-2.5 text-sm border-t border-border pt-4">
           <div className="flex items-start gap-2.5">
             <MapPin size={15} className="text-primary flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-stone-700">{lab.address}</p>
-              <p className="text-stone-400 text-xs">{lab.city} – {lab.pincode}</p>
+              <p className="text-stone-400 text-xs">
+                {lab.city} – {lab.pincode}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
             <Phone size={15} className="text-primary flex-shrink-0" />
-            <a href={`tel:${lab.phone}`} className="text-stone-700 hover:text-primary transition-colors">
+            <a
+              href={`tel:${lab.phone}`}
+              className="text-stone-700 hover:text-primary transition-colors"
+            >
               {lab.phone}
             </a>
           </div>
@@ -117,7 +146,7 @@ export default async function LabDetailPage({ params }: Props) {
             <Clock size={15} className="text-primary flex-shrink-0" />
             <span className="text-stone-700">
               {lab.openTime} – {lab.closeTime}
-              <span className="text-stone-400 ml-1">· {lab.openDays}</span>
+              <span className="text-stone-400 ml-1.5">· {lab.openDays}</span>
             </span>
           </div>
           {lab.homeCollection && (
@@ -125,7 +154,9 @@ export default async function LabDetailPage({ params }: Props) {
               <HomeIcon size={15} className="text-primary flex-shrink-0" />
               <span className="text-stone-700">
                 Home collection available
-                <span className="text-stone-400 ml-1">· ₹{lab.homeCollectionFee} fee</span>
+                <span className="text-stone-400 ml-1.5">
+                  · {formatCurrency(lab.homeCollectionFee)} fee
+                </span>
               </span>
             </div>
           )}
@@ -133,9 +164,9 @@ export default async function LabDetailPage({ params }: Props) {
       </div>
 
       {/* Map placeholder */}
-      <div className="rounded-2xl border border-border overflow-hidden mb-4 bg-stone-100 relative h-36 flex items-center justify-center">
+      <div className="rounded-2xl border border-border overflow-hidden mb-4 bg-stone-100 h-32 flex items-center justify-center">
         <div className="text-center">
-          <MapPin size={24} className="text-primary mx-auto mb-1" />
+          <MapPin size={22} className="text-primary mx-auto mb-1" />
           <p className="text-xs text-stone-500">{lab.area}, Hyderabad</p>
           <a
             href={`https://maps.google.com/?q=${lab.lat},${lab.lng}`}
@@ -148,15 +179,66 @@ export default async function LabDetailPage({ params }: Props) {
         </div>
       </div>
 
+      {/* Thyrocare savings comparison */}
+      {comparisonTests.length > 0 && (
+        <div className="rounded-2xl border border-green-200 bg-green-50 p-4 mb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-green-100">
+              <TrendingDown size={14} className="text-green-700" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-green-800">Save vs Thyrocare</p>
+              <p className="text-[11px] text-green-600">
+                Our prices vs Thyrocare benchmark
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            {comparisonTests.map(({ test, lt }) => {
+              const thyroPrice = thyrocarePrices[test.id]!;
+              const saving = thyroPrice - lt.price;
+              return (
+                <div
+                  key={test.id}
+                  className="flex items-center gap-3 rounded-xl bg-white border border-green-100 px-3 py-2.5"
+                >
+                  <CheckCircle2 size={14} className="text-green-500 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-stone-900 truncate">
+                      {test.shortName ?? test.name}
+                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs font-bold text-stone-900">
+                        {formatCurrency(lt.price)}
+                      </span>
+                      <span className="text-xs text-stone-400 line-through">
+                        {formatCurrency(thyroPrice)}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-[11px] font-bold bg-green-100 text-green-700 rounded-full px-2 py-0.5 flex-shrink-0 whitespace-nowrap">
+                    Save {formatCurrency(saving)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Tests offered */}
       <div className="mb-6">
         <h2 className="font-heading font-bold text-stone-900 mb-1">
           Tests offered ({offeredTests.length})
         </h2>
-        <p className="text-xs text-stone-400 mb-3">Prices at this lab. Tap a test to learn more.</p>
+        <p className="text-xs text-stone-400 mb-3">
+          Prices at this lab. Tap a test to learn more.
+        </p>
 
         {offeredTests.length === 0 ? (
-          <p className="text-sm text-stone-400 text-center py-8">No tests listed yet.</p>
+          <p className="text-sm text-stone-400 text-center py-8">
+            No tests listed yet.
+          </p>
         ) : (
           <div className="flex flex-col gap-5">
             {Array.from(byCategory.entries()).map(([catId, entries]) => (
@@ -165,41 +247,64 @@ export default async function LabDetailPage({ params }: Props) {
                   {categoryLabels[catId] ?? catId}
                 </p>
                 <div className="flex flex-col gap-2">
-                  {entries.map(({ test, lt }) => (
-                    <div
-                      key={test.id}
-                      className="flex items-center gap-3 rounded-2xl border border-border bg-white px-4 py-3"
-                    >
-                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 flex-shrink-0">
-                        <FlaskConical size={15} className="text-primary" />
+                  {entries.map(({ test, lt }) => {
+                    const thyroPrice = thyrocarePrices[test.id];
+                    const saving =
+                      thyroPrice && thyroPrice > lt.price
+                        ? thyroPrice - lt.price
+                        : null;
+                    return (
+                      <div
+                        key={test.id}
+                        className="flex items-center gap-3 rounded-2xl border border-border bg-white px-4 py-3 hover:border-primary/40 transition-colors"
+                      >
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 flex-shrink-0">
+                          <FlaskConical size={15} className="text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Link
+                            href={`/tests/${test.slug}`}
+                            className="block text-sm font-semibold text-stone-900 hover:text-primary transition-colors truncate"
+                          >
+                            {test.name}
+                            {test.shortName && (
+                              <span className="text-stone-400 font-normal ml-1 text-xs">
+                                ({test.shortName})
+                              </span>
+                            )}
+                          </Link>
+                          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                            <p className="text-xs text-stone-400">
+                              Report in {test.turnaroundHours}h
+                              {lt.homeCollectionAvailable && (
+                                <span className="text-teal-600 ml-2">
+                                  · Home ✓
+                                </span>
+                              )}
+                            </p>
+                            {saving !== null && (
+                              <span className="text-[10px] font-bold bg-green-50 text-green-700 border border-green-200 rounded-full px-1.5 py-0.5">
+                                Save {formatCurrency(saving)} vs Thyrocare
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                          <span className="font-heading font-bold text-stone-900 text-base leading-none">
+                            {formatCurrency(lt.price)}
+                          </span>
+                          <AddToCartButton
+                            item={{
+                              id: test.id,
+                              type: "test",
+                              name: test.name,
+                              price: lt.price,
+                            }}
+                          />
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <Link
-                          href={`/tests/${test.slug}`}
-                          className="block text-sm font-semibold text-stone-900 hover:text-primary transition-colors truncate"
-                        >
-                          {test.name}
-                          {test.shortName && (
-                            <span className="text-stone-400 font-normal ml-1 text-xs">({test.shortName})</span>
-                          )}
-                        </Link>
-                        <p className="text-xs text-stone-400 mt-0.5">
-                          Report in {test.turnaroundHours}h
-                          {lt.homeCollectionAvailable && (
-                            <span className="text-teal-600 ml-2">· Home ✓</span>
-                          )}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                        <span className="font-heading font-bold text-stone-900 text-base leading-none">
-                          {formatCurrency(lt.price)}
-                        </span>
-                        <AddToCartButton
-                          item={{ id: test.id, type: "test", name: test.name, price: lt.price }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
             ))}
@@ -210,7 +315,7 @@ export default async function LabDetailPage({ params }: Props) {
       {/* Sticky CTA */}
       <div className="sticky bottom-0 -mx-4 sm:-mx-5 bg-white border-t border-border px-4 py-3 pb-safe sm:static sm:mx-0 sm:border-0 sm:pb-6 sm:pt-0">
         <Link
-          href={`/book`}
+          href="/tests"
           className="flex items-center justify-center gap-2 w-full h-11 rounded-xl bg-primary text-white font-semibold text-sm hover:bg-teal-700 transition-colors"
         >
           Book a Test at {lab.name.split(" ")[0]}

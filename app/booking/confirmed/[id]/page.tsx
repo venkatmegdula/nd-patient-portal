@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   CheckCircle2, Calendar, Building2, Home as HomeIcon,
-  Clock, User, ArrowRight, FileText
+  Clock, User, ArrowRight, FileText, MessageCircle
 } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
 import { useBookingStore } from "@/stores/bookingStore";
@@ -20,6 +20,7 @@ export default function ConfirmedPage({ params }: Props) {
   const router = useRouter();
   const { lastBooking } = useBookingStore();
   const hasNavigated = useRef(false);
+  const [whatsappEnabled, setWhatsappEnabled] = useState(false);
 
   useEffect(() => {
     // If no lastBooking (e.g. page refresh), redirect to home
@@ -136,6 +137,43 @@ export default function ConfirmedPage({ params }: Props) {
             <span className="font-heading font-extrabold text-lg text-stone-900">
               {formatCurrency(lastBooking.total)}
             </span>
+          </div>
+        </div>
+      </div>
+
+      {/* WhatsApp notifications opt-in card */}
+      <div className="rounded-2xl border border-border bg-white border-l-4 border-l-green-400 p-4 mb-4">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-50 flex-shrink-0">
+            <MessageCircle size={20} className="text-green-500" fill="currentColor" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-stone-900 text-sm mb-0.5">
+              Get your report on WhatsApp
+            </p>
+            <p className="text-xs text-stone-500 mb-3">
+              We'll send your report link and booking updates via WhatsApp
+            </p>
+            <button
+              onClick={() => setWhatsappEnabled((prev) => !prev)}
+              className={
+                whatsappEnabled
+                  ? "inline-flex items-center gap-1.5 rounded-lg bg-green-50 border border-green-200 px-3 py-1.5 text-xs font-semibold text-green-700 transition-all"
+                  : "inline-flex items-center gap-1.5 rounded-lg bg-white border border-border px-3 py-1.5 text-xs font-semibold text-stone-600 hover:border-green-300 transition-all"
+              }
+            >
+              {whatsappEnabled ? (
+                <>
+                  <CheckCircle2 size={13} className="text-green-600" />
+                  WhatsApp updates enabled!
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 size={13} className="text-stone-400" />
+                  Enable WhatsApp updates
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

@@ -196,3 +196,25 @@ export const labs: Lab[] = [
 export function getLabById(id: string): Lab | undefined {
   return labs.find((l) => l.id === id);
 }
+
+// Thyrocare benchmark prices for key tests (used for price comparison)
+export const thyrocarePrices: Record<string, number> = {
+  "test-cbc":    249,
+  "test-fbs":    99,
+  "test-hba1c":  399,
+  "test-lipid":  499,
+  "test-tft":    599,
+  "test-lft":    499,
+  "test-kft":    499,
+  "test-vitd":   1099,
+  "test-vitb12": 899,
+  "test-iron":   649,
+  "test-dengue": 699,
+  "test-psa":    899,
+};
+
+export function getBenchmarkSaving(testId: string, price: number): number | null {
+  const benchmark = thyrocarePrices[testId];
+  if (!benchmark) return null;
+  return Math.max(0, benchmark - price);
+}

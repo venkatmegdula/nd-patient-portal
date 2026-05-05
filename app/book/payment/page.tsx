@@ -19,8 +19,8 @@ export default function PaymentPage() {
   const [paying, setPaying] = useState(false);
 
   useEffect(() => {
-    if (cart.length === 0) router.replace("/book");
-  }, [cart, router]);
+    if (cart.length === 0 && !paying) router.replace("/book");
+  }, [cart, paying, router]);
 
   async function handlePay() {
     setPaying(true);

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { cn, formatCurrency } from "@/lib/utils";
 import { Clock, Home, ShoppingCart, Check } from "lucide-react";
 import type { DiagnosticTest } from "@/lib/types";
@@ -43,9 +44,11 @@ export function TestCard({
     return (
       <div className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-white p-4 hover:border-primary/40 transition-colors">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-stone-900 text-[15px] leading-tight truncate">
-            {test.name}
-          </h3>
+          <Link href={`/tests/${test.slug}`} className="block">
+            <h3 className="font-semibold text-stone-900 text-[15px] leading-tight truncate hover:text-primary transition-colors">
+              {test.name}
+            </h3>
+          </Link>
           <div className="flex items-center gap-3 mt-1 text-xs text-stone-400">
             <span className="flex items-center gap-1">
               <Clock size={11} />
@@ -94,9 +97,11 @@ export function TestCard({
   return (
     <div className="flex flex-col rounded-2xl border border-border bg-white p-4 hover:border-primary/40 hover:shadow-sm transition-all">
       <div className="flex items-start justify-between mb-2">
-        <h3 className="font-semibold text-stone-900 text-[15px] leading-tight flex-1 mr-2">
-          {test.name}
-        </h3>
+        <Link href={`/tests/${test.slug}`} className="flex-1 mr-2">
+          <h3 className="font-semibold text-stone-900 text-[15px] leading-tight hover:text-primary transition-colors">
+            {test.name}
+          </h3>
+        </Link>
         <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-500 flex-shrink-0">
           {test.sampleType === "Non-invasive" ? "Non-invasive" : "Blood"}
         </span>

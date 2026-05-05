@@ -146,3 +146,46 @@ export interface SavedAddress {
   pincode: string;
   area: string;
 }
+
+/* ── v2 Types ── */
+
+export type UserType = "patient" | "family-manager" | "corporate" | "doctor";
+
+export interface FamilyMember {
+  id: string;
+  name: string;
+  relation: "self" | "spouse" | "child" | "parent" | "other";
+  dob: string;                  // "YYYY-MM-DD"
+  gender: "male" | "female" | "other";
+}
+
+export interface LoyaltyAccount {
+  points: number;
+  tier: "bronze" | "silver" | "gold";
+  totalEarned: number;
+  referralCode: string;
+}
+
+export interface HealthReminder {
+  id: string;
+  testName: string;
+  dueDate: string;              // "YYYY-MM-DD"
+  frequency: "monthly" | "quarterly" | "half-yearly" | "annually";
+  active: boolean;
+}
+
+export interface ReportAISummary {
+  bookingId: string;
+  interpretation: string;
+  flaggedValues: string[];
+  recommendations: string[];
+  generatedAt: string;
+}
+
+export interface AgeGenderRecommendation {
+  testId: string;
+  ageMin: number;
+  ageMax: number;
+  gender: "male" | "female" | "all";
+  priority: "high" | "medium";
+}

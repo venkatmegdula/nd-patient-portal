@@ -27,6 +27,7 @@ interface BookingStore {
   patientAge: string;
   patientGender: "male" | "female" | "other" | "";
   patientNotes: string;
+  selectedFamilyMemberId: string | null;
   couponCode: string;
   discount: number;
 
@@ -36,6 +37,7 @@ interface BookingStore {
   setCollectionAddress: (address: string) => void;
   setSlot: (date: string, time: string) => void;
   setPatient: (data: { name: string; age: string; gender: "male" | "female" | "other" | ""; notes: string }) => void;
+  setSelectedFamilyMember: (id: string | null) => void;
   applyCoupon: (code: string, discount: number) => void;
 
   /* Computed */
@@ -70,19 +72,20 @@ const COUPONS: Record<string, number> = {
 export const useBookingStore = create<BookingStore>()(
   persist(
     (set, get) => ({
-      cart:              [],
-      collectionType:    null,
-      selectedLabId:     null,
-      collectionAddress: null,
-      slotDate:          null,
-      slotTime:          null,
-      patientName:       "",
-      patientAge:        "",
-      patientGender:     "",
-      patientNotes:      "",
-      couponCode:        "",
-      discount:          0,
-      lastBooking:       null,
+      cart:                    [],
+      collectionType:          null,
+      selectedLabId:           null,
+      collectionAddress:       null,
+      slotDate:                null,
+      slotTime:                null,
+      patientName:             "",
+      patientAge:              "",
+      patientGender:           "",
+      patientNotes:            "",
+      selectedFamilyMemberId:  null,
+      couponCode:              "",
+      discount:                0,
+      lastBooking:             null,
 
       addToCart: (item) =>
         set((s) => ({
@@ -96,18 +99,19 @@ export const useBookingStore = create<BookingStore>()(
 
       clearCart: () =>
         set({
-          cart:              [],
-          collectionType:    null,
-          selectedLabId:     null,
-          collectionAddress: null,
-          slotDate:          null,
-          slotTime:          null,
-          patientName:       "",
-          patientAge:        "",
-          patientGender:     "",
-          patientNotes:      "",
-          couponCode:        "",
-          discount:          0,
+          cart:                   [],
+          collectionType:         null,
+          selectedLabId:          null,
+          collectionAddress:      null,
+          slotDate:               null,
+          slotTime:               null,
+          patientName:            "",
+          patientAge:             "",
+          patientGender:          "",
+          patientNotes:           "",
+          selectedFamilyMemberId: null,
+          couponCode:             "",
+          discount:               0,
         }),
 
       setCollectionType: (type) => set({ collectionType: type }),
@@ -121,6 +125,7 @@ export const useBookingStore = create<BookingStore>()(
           patientGender: data.gender,
           patientNotes:  data.notes,
         }),
+      setSelectedFamilyMember: (id) => set({ selectedFamilyMemberId: id }),
       applyCoupon: (code, discount) => set({ couponCode: code, discount }),
 
       subtotal: () => get().cart.reduce((sum, c) => sum + c.price, 0),
@@ -165,17 +170,18 @@ export const useBookingStore = create<BookingStore>()(
 
       resetFlow: () =>
         set({
-          collectionType:    null,
-          selectedLabId:     null,
-          collectionAddress: null,
-          slotDate:          null,
-          slotTime:          null,
-          patientName:       "",
-          patientAge:        "",
-          patientGender:     "",
-          patientNotes:      "",
-          couponCode:        "",
-          discount:          0,
+          collectionType:         null,
+          selectedLabId:          null,
+          collectionAddress:      null,
+          slotDate:               null,
+          slotTime:               null,
+          patientName:            "",
+          patientAge:             "",
+          patientGender:          "",
+          patientNotes:           "",
+          selectedFamilyMemberId: null,
+          couponCode:             "",
+          discount:               0,
         }),
     }),
     {

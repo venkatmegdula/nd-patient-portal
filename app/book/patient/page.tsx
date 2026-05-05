@@ -6,6 +6,7 @@ import { ChevronLeft, User } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
 import { BookingProgressBar } from "@/components/booking/BookingProgressBar";
 import { useBookingStore } from "@/stores/bookingStore";
+import { useAuthStore } from "@/stores/authStore";
 import { cn } from "@/lib/utils";
 
 const GENDER_OPTIONS = [
@@ -16,8 +17,12 @@ const GENDER_OPTIONS = [
 
 export default function PatientPage() {
   const router = useRouter();
-  const { cart, patientName, patientAge, patientGender, patientNotes, setPatient } =
+  const { cart, patientName, patientAge, patientGender, patientNotes, setPatient, setSelectedFamilyMember } =
     useBookingStore();
+  const { name: selfName, familyMembers } = useAuthStore();
+
+  // "myself" | family member id
+  const [selectedFor, setSelectedFor] = useState<string>("myself");
 
   const [name, setName] = useState(patientName);
   const [age, setAge] = useState(patientAge);
@@ -27,6 +32,26 @@ export default function PatientPage() {
   useEffect(() => {
     if (cart.length === 0) router.replace("/book");
   }, [cart, router]);
+
+  function handleSelectFor(id: string) {
+    setSelectedFor(id);
+
+    if (id === "myself") {
+      setSelectedFamilyMember(null);
+      setName("");
+      setAge("");
+      setGender("");
+    } else {
+      const member = familyMembers.find((m) => m.id === id);
+      if (!member) return;
+      setSelectedFamilyMember(member.id);
+      setName(member.name);
+      const dobYear = new Date(member.dob).getFullYear();
+      const computedAge = String(new Date().getFullYear() - dobYear);
+      setAge(computedAge);
+      setGender(member.gender);
+    }
+  }
 
   const canContinue = name.trim().length >= 2 && age.trim() !== "" && gender !== "";
 
@@ -55,6 +80,43 @@ export default function PatientPage() {
       </p>
 
       <div className="flex flex-col gap-5">
+        {/* Who is this for? */}
+        <div>
+          <label className="block text-sm font-semibold text-stone-700 mb-2">
+            Who is this for?
+          </label>
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {/* Myself chip */}
+            <button
+              onClick={() => handleSelectFor("myself")}
+              className={cn(
+                "flex-shrink-0 px-4 h-9 rounded-full border-2 text-sm font-semibold transition-all whitespace-nowrap",
+                selectedFor === "myself"
+                  ? "border-primary bg-teal-50 text-teal-700"
+                  : "border-border bg-white text-stone-600 hover:border-primary/40"
+              )}
+            >
+              {selfName ? `Myself (${selfName})` : "Myself"}
+            </button>
+
+            {/* Family member chips */}
+            {familyMembers.map((member) => (
+              <button
+                key={member.id}
+                onClick={() => handleSelectFor(member.id)}
+                className={cn(
+                  "flex-shrink-0 px-4 h-9 rounded-full border-2 text-sm font-semibold transition-all whitespace-nowrap",
+                  selectedFor === member.id
+                    ? "border-primary bg-teal-50 text-teal-700"
+                    : "border-border bg-white text-stone-600 hover:border-primary/40"
+                )}
+              >
+                {member.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Name */}
         <div>
           <label className="block text-sm font-semibold text-stone-700 mb-2">

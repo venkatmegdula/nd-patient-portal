@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   User, Phone, Edit3, MapPin, LogOut, HelpCircle,
-  ChevronRight, Plus, ShieldCheck
+  ChevronRight, Plus, ShieldCheck, Users, Star, Bell
 } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
 import { useAuthStore } from "@/stores/authStore";
@@ -17,7 +17,7 @@ const SAVED_ADDRESSES = [
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { isLoggedIn, name, phone, logout } = useAuthStore();
+  const { isLoggedIn, name, phone, logout, loyalty } = useAuthStore();
 
   function handleLogout() {
     logout();
@@ -70,19 +70,51 @@ export default function ProfilePage() {
 
       {/* Quick links */}
       <div className="rounded-2xl border border-border bg-white divide-y divide-border mb-4 overflow-hidden">
-        {[
-          { href: "/my-bookings", icon: ShieldCheck, label: "My Bookings" },
-          { href: "/reports", icon: ShieldCheck, label: "My Reports" },
-        ].map(({ href, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className="flex items-center justify-between px-4 py-3.5 hover:bg-stone-50 transition-colors"
-          >
-            <span className="text-sm font-medium text-stone-800">{label}</span>
+        <Link
+          href="/my-bookings"
+          className="flex items-center justify-between px-4 py-3.5 hover:bg-stone-50 transition-colors"
+        >
+          <div className="flex items-center gap-2.5">
+            <ShieldCheck size={16} className="text-stone-400" />
+            <span className="text-sm font-medium text-stone-800">My Bookings</span>
+          </div>
+          <ChevronRight size={15} className="text-stone-300" />
+        </Link>
+        <Link
+          href="/reports"
+          className="flex items-center justify-between px-4 py-3.5 hover:bg-stone-50 transition-colors"
+        >
+          <div className="flex items-center gap-2.5">
+            <ShieldCheck size={16} className="text-stone-400" />
+            <span className="text-sm font-medium text-stone-800">My Reports</span>
+          </div>
+          <ChevronRight size={15} className="text-stone-300" />
+        </Link>
+        <Link
+          href="/family"
+          className="flex items-center justify-between px-4 py-3.5 hover:bg-stone-50 transition-colors"
+        >
+          <div className="flex items-center gap-2.5">
+            <Users size={16} className="text-stone-400" />
+            <span className="text-sm font-medium text-stone-800">Family Members</span>
+          </div>
+          <ChevronRight size={15} className="text-stone-300" />
+        </Link>
+        <Link
+          href="/rewards"
+          className="flex items-center justify-between px-4 py-3.5 hover:bg-stone-50 transition-colors"
+        >
+          <div className="flex items-center gap-2.5">
+            <Star size={16} className="text-amber-400" />
+            <span className="text-sm font-medium text-stone-800">My Rewards</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-teal-700 bg-teal-50 rounded-full px-2 py-0.5">
+              {loyalty.points} pts
+            </span>
             <ChevronRight size={15} className="text-stone-300" />
-          </Link>
-        ))}
+          </div>
+        </Link>
       </div>
 
       {/* Saved Addresses */}
@@ -110,6 +142,20 @@ export default function ProfilePage() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Health Reminders */}
+      <div className="rounded-2xl border border-border bg-white divide-y divide-border mb-4 overflow-hidden">
+        <Link
+          href="/my-health"
+          className="flex items-center justify-between px-4 py-3.5 hover:bg-stone-50 transition-colors"
+        >
+          <div className="flex items-center gap-2.5">
+            <Bell size={16} className="text-stone-400" />
+            <span className="text-sm font-medium text-stone-800">Health Reminders</span>
+          </div>
+          <ChevronRight size={15} className="text-stone-300" />
+        </Link>
       </div>
 
       {/* Help & Logout */}
