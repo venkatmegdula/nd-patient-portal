@@ -7,6 +7,7 @@ import { PageShell } from "@/components/layout/PageShell";
 import { BookingProgressBar } from "@/components/booking/BookingProgressBar";
 import { AccreditationBadge } from "@/components/ui/AccreditationBadge";
 import { useBookingStore } from "@/stores/bookingStore";
+import { useBookingHydrated } from "@/hooks/useBookingHydrated";
 import { labs } from "@/data/labs";
 import { labTests } from "@/data/tests";
 import { packages } from "@/data/packages";
@@ -15,10 +16,12 @@ import { formatCurrency, cn } from "@/lib/utils";
 export default function LabPickPage() {
   const router = useRouter();
   const { cart, selectedLabId, setSelectedLabId } = useBookingStore();
+  const hydrated = useBookingHydrated();
 
   useEffect(() => {
+    if (!hydrated) return;
     if (cart.length === 0) router.replace("/book");
-  }, [cart, router]);
+  }, [cart, hydrated, router]);
 
   // Build test ID list from cart
   const allTestIds = useMemo(() => {

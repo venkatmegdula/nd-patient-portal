@@ -6,15 +6,18 @@ import { Building2, Home as HomeIcon, ChevronLeft } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
 import { BookingProgressBar } from "@/components/booking/BookingProgressBar";
 import { useBookingStore } from "@/stores/bookingStore";
+import { useBookingHydrated } from "@/hooks/useBookingHydrated";
 import { cn } from "@/lib/utils";
 
 export default function CollectionPage() {
   const router = useRouter();
   const { cart, collectionType, setCollectionType } = useBookingStore();
+  const hydrated = useBookingHydrated();
 
   useEffect(() => {
+    if (!hydrated) return;
     if (cart.length === 0) router.replace("/book");
-  }, [cart, router]);
+  }, [cart, hydrated, router]);
 
   function handleSelect(type: "lab-visit" | "home-collection") {
     setCollectionType(type);

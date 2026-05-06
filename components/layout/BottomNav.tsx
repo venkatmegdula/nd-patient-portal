@@ -16,6 +16,15 @@ const navItems = [
 export function BottomNav() {
   const pathname = usePathname();
 
+  // Hide bottom nav on full-screen flows where a sticky bottom bar is present
+  const isHidden =
+    pathname.startsWith("/book") ||      // booking flow + confirmation
+    pathname.startsWith("/login") ||      // OTP login
+    pathname.startsWith("/onboarding") || // onboarding setup
+    pathname.startsWith("/discover");     // AI chat has its own sticky input bar
+
+  if (isHidden) return null;
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-white border-t border-border pb-safe"

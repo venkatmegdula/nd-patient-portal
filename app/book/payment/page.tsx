@@ -6,6 +6,7 @@ import { ChevronLeft, ShieldCheck, Smartphone, CreditCard, Building } from "luci
 import { PageShell } from "@/components/layout/PageShell";
 import { BookingProgressBar } from "@/components/booking/BookingProgressBar";
 import { useBookingStore } from "@/stores/bookingStore";
+import { useBookingHydrated } from "@/hooks/useBookingHydrated";
 import { formatCurrency, cn } from "@/lib/utils";
 
 type PayMethod = "upi" | "card" | "netbanking";
@@ -14,13 +15,15 @@ export default function PaymentPage() {
   const router = useRouter();
   const { cart, total, confirmBooking } = useBookingStore();
 
+  const hydrated = useBookingHydrated();
   const [method, setMethod] = useState<PayMethod>("upi");
   const [upiId, setUpiId] = useState("");
   const [paying, setPaying] = useState(false);
 
   useEffect(() => {
+    if (!hydrated) return;
     if (cart.length === 0 && !paying) router.replace("/book");
-  }, [cart, paying, router]);
+  }, [cart, hydrated, paying, router]);
 
   async function handlePay() {
     setPaying(true);

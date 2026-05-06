@@ -22,7 +22,7 @@ export function PageShell({
         className={cn(
           "flex-1 px-page py-4",
           !noPadBottom && "pb-24 sm:pb-6",
-          noPadBottom && "pb-0",
+          noPadBottom && "pb-safe",
           className
         )}
       >

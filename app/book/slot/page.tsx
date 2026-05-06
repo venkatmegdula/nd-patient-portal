@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { PageShell } from "@/components/layout/PageShell";
 import { BookingProgressBar } from "@/components/booking/BookingProgressBar";
 import { useBookingStore } from "@/stores/bookingStore";
+import { useBookingHydrated } from "@/hooks/useBookingHydrated";
 import { getAvailableDates, getSlotsForDate } from "@/data/slots";
 import { cn } from "@/lib/utils";
 import type { TimeSlot } from "@/lib/types";
@@ -20,6 +21,7 @@ const PERIOD_LABELS: Record<string, string> = {
 export default function SlotPage() {
   const router = useRouter();
   const { cart, slotDate, slotTime, setSlot } = useBookingStore();
+  const hydrated = useBookingHydrated();
 
   const dates = getAvailableDates();
   const [selectedDate, setSelectedDate] = useState<Date>(
@@ -28,8 +30,9 @@ export default function SlotPage() {
   const [selectedTime, setSelectedTime] = useState<string | null>(slotTime);
 
   useEffect(() => {
+    if (!hydrated) return;
     if (cart.length === 0) router.replace("/book");
-  }, [cart, router]);
+  }, [cart, hydrated, router]);
 
   const slots = getSlotsForDate(selectedDate);
   const allSlots: { period: string; slots: TimeSlot[] }[] = [

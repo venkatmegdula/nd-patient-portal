@@ -313,7 +313,7 @@ export default function DiscoverPage() {
       </div>
 
       {/* ── Input bar (sticky bottom) ── */}
-      <div className="sticky bottom-0 border-t border-border bg-white/90 backdrop-blur-sm pt-3 pb-safe pb-6">
+      <div className="sticky bottom-0 -mx-4 sm:-mx-5 border-t border-border bg-white/90 backdrop-blur-sm px-4 sm:px-5 pt-3 pb-3 pb-safe">
         {/* Preset chips (compact, visible once chat started) */}
         {hasMessages && (
           <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">

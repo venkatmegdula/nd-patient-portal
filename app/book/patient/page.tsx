@@ -6,6 +6,7 @@ import { ChevronLeft, User } from "lucide-react";
 import { PageShell } from "@/components/layout/PageShell";
 import { BookingProgressBar } from "@/components/booking/BookingProgressBar";
 import { useBookingStore } from "@/stores/bookingStore";
+import { useBookingHydrated } from "@/hooks/useBookingHydrated";
 import { useAuthStore } from "@/stores/authStore";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ export default function PatientPage() {
   const { cart, patientName, patientAge, patientGender, patientNotes, setPatient, setSelectedFamilyMember } =
     useBookingStore();
   const { name: selfName, familyMembers } = useAuthStore();
+  const hydrated = useBookingHydrated();
 
   // "myself" | family member id
   const [selectedFor, setSelectedFor] = useState<string>("myself");
@@ -30,8 +32,9 @@ export default function PatientPage() {
   const [notes, setNotes] = useState(patientNotes);
 
   useEffect(() => {
+    if (!hydrated) return;
     if (cart.length === 0) router.replace("/book");
-  }, [cart, router]);
+  }, [cart, hydrated, router]);
 
   function handleSelectFor(id: string) {
     setSelectedFor(id);

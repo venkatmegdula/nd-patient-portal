@@ -6,6 +6,7 @@ import { ChevronLeft, Tag, X, MapPin, Clock, User, Building2, Home as HomeIcon }
 import { PageShell } from "@/components/layout/PageShell";
 import { BookingProgressBar } from "@/components/booking/BookingProgressBar";
 import { useBookingStore, COUPONS } from "@/stores/bookingStore";
+import { useBookingHydrated } from "@/hooks/useBookingHydrated";
 import { getLabById } from "@/data/labs";
 import { formatCurrency, formatDate, formatTime } from "@/lib/utils";
 
@@ -17,13 +18,15 @@ export default function SummaryPage() {
     couponCode, discount, applyCoupon, subtotal, total,
   } = useBookingStore();
 
+  const hydrated = useBookingHydrated();
   const [couponInput, setCouponInput] = useState(couponCode);
   const [couponError, setCouponError] = useState("");
   const [couponApplied, setCouponApplied] = useState(!!couponCode);
 
   useEffect(() => {
+    if (!hydrated) return;
     if (cart.length === 0) router.replace("/book");
-  }, [cart, router]);
+  }, [cart, hydrated, router]);
 
   const lab = selectedLabId ? getLabById(selectedLabId) : null;
   const homeCollFee = collectionType === "home-collection" ? 100 : 0;
